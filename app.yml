@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=https://schemas.pennsieve.io/app-manifest/v1.json
+schemaVersion: "1.0"
+application:
+  name: EEG Spikes
+  description: >-
+    Detects interictal epileptiform discharges (spikes) on clinical scalp EEG with epycom's
+    Janca et al. 2015 detector (or Barkmeier et al. 2012), both developed and validated on
+    intracranial EEG and run here on the longitudinal bipolar montage. Writes every spike, the
+    spike rate per channel, multi-channel spike events with their leading channel and
+    hemisphere, the lateralisation of each recording and, when eeg-sleep's hypnogram is
+    linked, spike rates per sleep stage. Seizures and bad segments are left out. Research
+    output, to be reviewed against the EEG.
+  type: processor
+  tags:
+    - eeg
+    - scalp-eeg
+    - electrophysiology
+    - epilepsy
+    - neurology
+    - neuroscience
+    - spike-detection
+    - biomarkers
+    - sleep
+runtime:
+  # One recording at a time, one 5-minute window of all channels at a time, channels in
+  # parallel (THREADS). Measured (amd64 emulated, 2 vCPU): a 13.5 h, 19-channel, 256 Hz Siena
+  # recording in 105 s at 1.23 GB cgroup peak (page cache included); see README "Runtime".
+  cpu: 2048
+  memory: 2048
+  computeTypes:
+    - standard
+  timeoutSeconds: 7200
+parameters:
+  - name: DETECTOR
+    type: string
+    label: Detector
+    description: >-
+      janca: Janca et al. 2015, envelope distribution modelling of the 10-60 Hz band
+      (recommended). barkmeier: Barkmeier et al. 2012, slope and amplitude criteria. Both were
+      validated on intracranial EEG; see the README for their performance on scalp EEG.
+    defaultValue: janca
+    validValues: [janca, barkmeier]
+  - name: JANCA_K1
+    type: number
+    label: Janca threshold k1
+    description: >-
+      Janca's threshold factor (higher = fewer, more obvious spikes). 3.65 is the published
+      default; on scalp EEG (vEpiSet) 5 roughly halves false detections at the cost of a third of
+      the true ones.
+    defaultValue: 3.65
+    min: 1
+    max: 20
+  - name: MONTAGE
+    type: string
+    label: Montage
+    description: >-
+      bipolar: derive the longitudinal bipolar montage (double banana, 18 pairs) from
+      referential recordings, as clinicians read spikes. referential: analyse the channels as
+      stored (eeg-prep's average reference). Bipolar-only recordings (e.g. CHB-MIT) are always
+      analysed on their pairs.
+    defaultValue: bipolar
+    validValues: [bipolar, referential]
+  - name: EXCLUDE_SEIZURE
+    type: boolean
+    label: Leave seizures out
+    description: >-
+      Leave annotated seizures out, with SEIZURE_MARGIN_S on both sides (to the end of the
+      recording when a seizure has no end). Interictal rates should not count ictal discharges.
+      bad_segment and artifact intervals are always left out.
+    defaultValue: true
+  - name: SEIZURE_MARGIN_S
+    type: number
+    label: Seizure margin (s)
+    description: Seconds left out before each seizure onset and after its end.
+    defaultValue: 60
+    min: 0
+  - name: WINDOW_S
+    type: number
+    label: Window (s)
+    description: >-
+      Length of the windows the recording is read and analysed in (10 s of context on each
+      side). Bounds memory; Janca's background statistics adapt within 5 s windows anyway.
+    defaultValue: 300
+    min: 60
+  - name: GROUP_WINDOW_MS
+    type: number
+    label: Event window (ms)
+    description: >-
+      Spikes on different channels within this many milliseconds of an event's first spike are
+      merged into one spike event; its leading channel is the one that peaks first.
+    defaultValue: 50
+    min: 1
+  - name: MIN_EVENT_CHANNELS
+    type: integer
+    label: Channels per counted event
+    description: >-
+      Spike events that span fewer channels are still listed in spike_events.csv but not counted
+      in the lateralisation, event rates, rates per stage and example figure. 1 counts all; 2-3
+      asks for a field (a scalp spike is usually seen on neighbouring channels) and trades
+      sensitivity for specificity (README, "Validation").
+    defaultValue: 1
+    min: 1
+  - name: THREADS
+    type: integer
+    label: Parallel workers
+    description: >-
+      Channels analysed in parallel; 0 = one per vCPU the container is given (its cgroup CPU
+      quota, not the host's CPU count), fewer when ~250 MB per worker would not fit its memory.
+    defaultValue: 0
+    min: 0
+  - name: LABEL
+    type: string
+    label: Output subfolder
+    description: When set, outputs are written to eeg-spikes/<LABEL>/ (for a workflow that runs this step twice).
+    defaultValue: ""
+inputs:
+  - name: eeg
+    description: >-
+      The BIDS-EEG derivative of eeg-prep (recordings.csv, *_desc-preproc_eeg.edf with
+      _channels.tsv and _events.tsv), or any BIDS-EEG dataset (HED-SCORE seizure events such as
+      BIDS Siena's are read), or plain EDF/BDF/BrainVision/FIF/EEGLAB files with 10-20 channel
+      names, referential or bipolar (CHB-MIT summary files give the seizures). Folders and
+      symlinks are followed.
+    mediaTypes:
+      - application/edf
+      - text/csv
+      - text/tab-separated-values
+      - application/json
+    placement: subfolder
+    required: true
+  - name: sleep
+    description: >-
+      Optional: eeg-sleep's output (hypnogram.csv, 30 s epochs, stages W/N1/N2/N3/R). Each spike
+      gets the stage of its epoch and rates_by_stage.csv is written. Without it, annotated
+      sleep/wake events are used when the recording has them.
+    mediaTypes:
+      - text/csv
+      - application/json
+    placement: subfolder
+    required: false
+outputs:
+  - name: spikes
+    description: >-
+      eeg-spikes/: spikes.csv, spike_rates.csv, spike_events.csv, lateralisation.csv,
+      rates_by_stage.csv (when stages are known), features.csv (spikerate_<detector>),
+      figures/*.png (spike-rate topomap, spikes per sleep stage, example spikes, laterality
+      index), summary.json and provenance.json.
+    mediaTypes:
+      - text/csv
+      - image/png
+      - application/json
+
+# How a release is tested before it is made public: the inputs a review run uses.
+# See app-deploy-service docs/app-manifest-review.md. The generator needs numpy and edfio only.
+review:
+  version: 1
+  generate:
+    command: python -m tests.make_fixture "$REVIEW_INPUT_DIR"
+    root: linked

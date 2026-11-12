@@ -1,0 +1,346 @@
+cff-version: "1.2.0"
+message: If you use this app, please cite it and the works it builds on, listed under references.
+type: software
+title: EEG Spikes
+abstract: 'Detects interictal epileptiform discharges (spikes) on clinical scalp EEG with the Janca et al. 2015 (or Barkmeier et al. 2012) detector from epycom, both developed and validated on intracranial EEG, on the longitudinal bipolar montage; writes spikes, per-channel rates, multi-channel spike events with their leading channel, lateralisation and rates per sleep stage, leaving seizures and bad segments out.'
+authors:
+- name: Pennsieve (University of Pennsylvania)
+contact:
+- given-names: Joost
+  family-names: Wagenaar
+  orcid: https://orcid.org/0009-0004-5925-5451
+  affiliation: University of Pennsylvania
+repository-code: https://github.com/pennsieve-apps/eeg-spikes
+license: Apache-2.0
+keywords:
+- eeg
+- scalp-eeg
+- electrophysiology
+- epilepsy
+- neurology
+- neuroscience
+- spike-detection
+- biomarkers
+- sleep
+references:
+- type: article
+  title: 'Detection of Interictal Epileptiform Discharges Using Signal Envelope Distribution Modelling: Application to Epileptic and Non-Epileptic Intracranial Recordings'
+  authors:
+  - family-names: Janca
+    given-names: Radek
+  - family-names: Jezdik
+    given-names: Petr
+  - family-names: Cmejla
+    given-names: Roman
+  - family-names: Tomasek
+    given-names: Martin
+  - family-names: Worrell
+    given-names: Gregory A.
+  - family-names: Stead
+    given-names: Matt
+  - family-names: Wagenaar
+    given-names: Joost
+  - family-names: Jefferys
+    given-names: John G. R.
+  - family-names: Krsek
+    given-names: Pavel
+  - family-names: Komarek
+    given-names: Vladimir
+  - family-names: Jiruska
+    given-names: Premysl
+  - family-names: Marusic
+    given-names: Petr
+  year: 2015
+  journal: Brain Topography
+  volume: 28
+  issue: '1'
+  start: '172'
+  end: '183'
+  doi: 10.1007/s10548-014-0379-1
+  identifiers:
+  - type: other
+    value: "24970691"
+- type: article
+  title: High inter-reviewer variability of spike detection on intracranial EEG addressed by an automated multi-channel algorithm
+  authors:
+  - family-names: Barkmeier
+    given-names: Daniel T.
+  - family-names: Shah
+    given-names: Aashit K.
+  - family-names: Flanagan
+    given-names: Danny
+  - family-names: Atkinson
+    given-names: Marie D.
+  - family-names: Agarwal
+    given-names: Rajeev
+  - family-names: Fuerst
+    given-names: Darren R.
+  - family-names: Jafari-Khouzani
+    given-names: Kourosh
+  - family-names: Loeb
+    given-names: Jeffrey A.
+  year: 2012
+  journal: Clinical Neurophysiology
+  volume: 123
+  issue: '6'
+  start: '1088'
+  end: '1095'
+  doi: 10.1016/j.clinph.2011.09.023
+  identifiers:
+  - type: other
+    value: "22033028"
+- type: article
+  title: MEG and EEG data analysis with MNE-Python
+  authors:
+  - family-names: Gramfort
+    given-names: Alexandre
+  - family-names: Luessi
+    given-names: Martin
+  - family-names: Larson
+    given-names: Eric
+  - family-names: Engemann
+    given-names: Denis A.
+  - family-names: Strohmeier
+    given-names: Daniel
+  - family-names: Brodbeck
+    given-names: Christian
+  - family-names: Goj
+    given-names: Roman
+  - family-names: Jas
+    given-names: Mainak
+  - family-names: Brooks
+    given-names: Teon
+  - family-names: Parkkonen
+    given-names: Lauri
+  - family-names: Hämäläinen
+    given-names: Matti
+  year: 2013
+  journal: Frontiers in Neuroscience
+  volume: 7
+  start: '267'
+  doi: 10.3389/fnins.2013.00267
+  identifiers:
+  - type: other
+    value: "24431986"
+- type: article
+  title: Interictal Spiking Increases with Sleep Depth in Temporal Lobe Epilepsy
+  authors:
+  - family-names: Malow
+    given-names: Beth A.
+  - family-names: Lin
+    given-names: Xihong
+  - family-names: Kushwaha
+    given-names: Ramesh
+  - family-names: Aldrich
+    given-names: Michael S.
+  year: 1998
+  journal: Epilepsia
+  volume: 39
+  issue: '12'
+  start: '1309'
+  end: '1316'
+  doi: 10.1111/j.1528-1157.1998.tb01329.x
+  identifiers:
+  - type: other
+    value: "9860066"
+- type: article
+  title: Spike patterns surrounding sleep and seizures localize the seizure‐onset zone in focal epilepsy
+  authors:
+  - family-names: Conrad
+    given-names: Erin C.
+  - family-names: Revell
+    given-names: Andrew Y.
+  - family-names: Greenblatt
+    given-names: Adam S.
+  - family-names: Gallagher
+    given-names: Ryan S.
+  - family-names: Pattnaik
+    given-names: Akash R.
+  - family-names: Hartmann
+    given-names: Nicole
+  - family-names: Gugger
+    given-names: James J.
+  - family-names: Shinohara
+    given-names: Russell T.
+  - family-names: Litt
+    given-names: Brian
+  - family-names: Marsh
+    given-names: Eric D.
+  - family-names: Davis
+    given-names: Kathryn A.
+  year: 2023
+  journal: Epilepsia
+  volume: 64
+  issue: '3'
+  start: '754'
+  end: '768'
+  doi: 10.1111/epi.17482
+  identifiers:
+  - type: other
+    value: "36484572"
+- type: article
+  title: An EEG dataset for interictal epileptiform discharge with spatial distribution information
+  authors:
+  - family-names: Lin
+    given-names: Nan
+  - family-names: Zheng
+    given-names: Mengxuan
+  - family-names: Li
+    given-names: Lian
+  - family-names: Hu
+    given-names: Peng
+  - family-names: Gao
+    given-names: Weifang
+  - family-names: Sun
+    given-names: Heyang
+  - family-names: Xu
+    given-names: Chang
+  - family-names: Yuan
+    given-names: Gonglin
+  - family-names: Liang
+    given-names: Zi
+  - family-names: Dong
+    given-names: Yisu
+  - family-names: He
+    given-names: Haibo
+  - family-names: Cui
+    given-names: Liying
+  - family-names: Lu
+    given-names: Qiang
+  year: 2025
+  journal: Scientific Data
+  volume: 12
+  issue: '1'
+  start: '229'
+  doi: 10.1038/s41597-025-04572-1
+  identifiers:
+  - type: other
+    value: "39920162"
+- type: data
+  title: An EEG dataset for interictal epileptiform discharge with spatial distribution information
+  authors:
+  - family-names: Lin
+    given-names: Nan
+  - family-names: zheng
+    given-names: Mengxuan
+  - family-names: Li
+    given-names: Lian
+  - family-names: Hu
+    given-names: Peng
+  - family-names: Gao
+    given-names: Weifang
+  - family-names: Sun
+    given-names: Heyang
+  - family-names: Xu
+    given-names: Chang
+  - family-names: Yuan
+    given-names: Gonglin
+  - family-names: Liang
+    given-names: Zi
+  - family-names: Dong
+    given-names: Yisu
+  - family-names: He
+    given-names: Haibo
+  - family-names: Cui
+    given-names: Liying
+  - family-names: Lu
+    given-names: Qiang
+  year: 2025
+  publisher:
+    name: figshare
+  doi: 10.6084/m9.figshare.28069568.v2
+  license: CC-BY-4.0
+- type: data
+  title: Siena Scalp EEG Database
+  authors:
+  - family-names: Detti
+    given-names: Paolo
+  year: 2020
+  publisher:
+    name: PhysioNet
+  doi: 10.13026/5d4a-j060
+- type: article
+  title: 'EEG Synchronization Analysis for Seizure Prediction: A Study on Data of Noninvasive Recordings'
+  authors:
+  - family-names: Detti
+    given-names: Paolo
+  - family-names: Vatti
+    given-names: Giampaolo
+  - family-names: Zabalo Manrique de Lara
+    given-names: Garazi
+  year: 2020
+  journal: Processes
+  volume: 8
+  issue: '7'
+  start: '846'
+  doi: 10.3390/pr8070846
+- type: data
+  title: BIDS Siena Scalp EEG Database
+  authors:
+  - family-names: Dan
+    given-names: Jonathan
+  - family-names: Detti
+    given-names: Paolo
+  year: 2024
+  publisher:
+    name: EPFL
+  doi: 10.5281/zenodo.10640762
+  license: CC-BY-4.0
+- type: data
+  title: CHB-MIT Scalp EEG Database
+  authors:
+  - family-names: Shoeb
+    given-names: Ali
+  year: 2010
+  publisher:
+    name: PhysioNet
+  doi: 10.13026/C2K01R
+  license: ODC-By-1.0
+- type: article
+  title: PhysioBank, PhysioToolkit, and PhysioNet
+  authors:
+  - family-names: Goldberger
+    given-names: Ary L.
+  - family-names: Amaral
+    given-names: Luis A. N.
+  - family-names: Glass
+    given-names: Leon
+  - family-names: Hausdorff
+    given-names: Jeffrey M.
+  - family-names: Ivanov
+    given-names: Plamen Ch.
+  - family-names: Mark
+    given-names: Roger G.
+  - family-names: Mietus
+    given-names: Joseph E.
+  - family-names: Moody
+    given-names: George B.
+  - family-names: Peng
+    given-names: Chung-Kang
+  - family-names: Stanley
+    given-names: H. Eugene
+  year: 2000
+  journal: Circulation
+  volume: 101
+  issue: '23'
+  start: e215
+  doi: 10.1161/01.CIR.101.23.e215
+  identifiers:
+  - type: other
+    value: "10851218"
+- type: software
+  title: 'epycom: ElectroPhYsiology COmputational Module'
+  authors:
+  - name: International Clinical Research Center, St. Anne's University Hospital Brno (FNUSA-ICRC), Biomedical Engineering
+  version: '0.3'
+  repository-code: https://github.com/ICRC-BME/epycom
+  url: https://pypi.org/project/epycom/0.3/
+  license: Apache-2.0
+- type: software
+  title: MNE-Python
+  authors:
+  - name: MNE-Python contributors
+  version: 1.12.1
+  repository-code: https://github.com/mne-tools/mne-python
+  url: https://mne.tools
+  license: BSD-3-Clause
