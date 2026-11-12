@@ -61,6 +61,7 @@ def _prepare_environment() -> None:
 
 _prepare_environment()
 
+import bisect  # noqa: E402
 import csv  # noqa: E402
 import json  # noqa: E402
 import logging  # noqa: E402
@@ -282,6 +283,13 @@ def process_recording(rec: E.Recording, params: dict, parallel, hypnograms: dict
     line_hz = E.line_freq(rec)
     det = params["DETECTOR"]
 
+    mask_iv = E.merge(plan.masks)
+    mask_starts = [m[0] for m in mask_iv]
+
+    def masked(t: float) -> bool:
+        i = bisect.bisect_right(mask_starts, t) - 1
+        return i >= 0 and t < mask_iv[i][1]
+
     labels = [c["label"] for c in achans]
     analysed: dict[str, list[tuple[float, float]]] = {l: [] for l in labels}
     found: dict[str, list[tuple[float, float, float]]] = {l: [] for l in labels}
@@ -312,13 +320,13 @@ def process_recording(rec: E.Recording, params: dict, parallel, hypnograms: dict
         t_read += tb - ta
         t_detect += time.monotonic() - tb
         windows += 1
-        core_ok = E.subtract([(c0, c1)], plan.masks)
+        core_ok = E.subtract([(c0, c1)], [m for m in mask_iv if m[1] > c0 and m[0] < c1])
         for lab, (dets, err) in zip(labels, results):
             if err:
                 errors.setdefault(lab, f"{c0:.0f}-{c1:.0f} s: {err}")
                 continue
             analysed[lab].extend(core_ok)
-            found[lab].extend(d for d in dets if not any(a <= d[0] < b for a, b in plan.masks))
+            found[lab].extend(d for d in dets if not masked(d[0]))
         done_core += c1 - c0
         if time.monotonic() - last_log >= PROGRESS_S:
             log.info("%s: %.0f%% (%.1f of %.1f min analysed so far)", rec.recording_id,

@@ -17,6 +17,9 @@ from collections import defaultdict
 from math import comb
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from processor import montage as MT  # noqa: E402
+
 
 def sign_test(k: int, n: int) -> float:
     """Two-sided binomial test of k successes in n against p = 0.5."""
@@ -44,15 +47,11 @@ def main(out: Path, info: Path, min_channels: int = 1) -> None:
         for r in csv.DictReader(fh):
             minutes[r["recording_id"].split("_")[0].replace("sub-", "")] += float(r["minutes"])
     rates = defaultdict(lambda: {"L": [0, 0.0], "R": [0, 0.0]})
-    hemi = {}
-    with open(out / "spike_events.csv", newline="") as fh:
-        pass
     with open(out / "spike_rates.csv", newline="") as fh:
         for r in csv.DictReader(fh):
             sub = r["recording_id"].split("_")[0].replace("sub-", "")
-            ch = r["channel"]
-            h = "L" if all(int(c[-1]) % 2 == 1 for c in ch.split("-") if c[-1].isdigit()) and not ch.endswith("z") \
-                and "z" not in ch else ("R" if "z" not in ch and all(int(c[-1]) % 2 == 0 for c in ch.split("-")) else "Z")
+            parsed = MT.parse(r["channel"])
+            h = MT.hemisphere(parsed[1]) if parsed else "Z"
             if h in ("L", "R"):
                 rates[sub][h][0] += int(r["n_spikes"])
                 rates[sub][h][1] += float(r["minutes"])

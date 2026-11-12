@@ -367,14 +367,29 @@ def subtract(intervals: list[tuple[float, float]], cut: list[tuple[float, float]
     return [(a, b) for a, b in out if b > a]
 
 
+def merge(intervals: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Sorted, non-overlapping union of intervals."""
+    out: list[tuple[float, float]] = []
+    for a, b in sorted(intervals):
+        if out and a <= out[-1][1]:
+            out[-1] = (out[-1][0], max(out[-1][1], b))
+        else:
+            out.append((a, b))
+    return out
+
+
 def overlap(a: list[tuple[float, float]], b: list[tuple[float, float]]) -> float:
     """Total length of the intersection of two interval lists (each without self-overlap)."""
-    total = 0.0
-    for a0, a1 in a:
-        for b0, b1 in b:
-            lo, hi = max(a0, b0), min(a1, b1)
-            if hi > lo:
-                total += hi - lo
+    a, b = merge(a), merge(b)
+    total, i, j = 0.0, 0, 0
+    while i < len(a) and j < len(b):
+        lo, hi = max(a[i][0], b[j][0]), min(a[i][1], b[j][1])
+        if hi > lo:
+            total += hi - lo
+        if a[i][1] < b[j][1]:
+            i += 1
+        else:
+            j += 1
     return total
 
 

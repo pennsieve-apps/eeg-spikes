@@ -45,10 +45,18 @@ class Hypnogram:
     def minutes(self, analysed: list[tuple[float, float]]) -> dict[str, float]:
         """Minutes of the analysed intervals in each stage."""
         out: dict[str, float] = {}
+        iv = E.merge(analysed)
+        starts = [x[0] for x in iv]
         for a, b, s in self.intervals:
-            m = E.overlap([(a, b)], analysed) / 60.0
+            k = max(0, bisect.bisect_right(starts, a) - 1)
+            m = 0.0
+            while k < len(iv) and iv[k][0] < b:
+                lo, hi = max(a, iv[k][0]), min(b, iv[k][1])
+                if hi > lo:
+                    m += hi - lo
+                k += 1
             if m > 0:
-                out[s] = out.get(s, 0.0) + m
+                out[s] = out.get(s, 0.0) + m / 60.0
         return out
 
 
