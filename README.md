@@ -186,7 +186,9 @@ low-passed at 30 Hz by its source.
 
 **CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure, read directly): runs as
 recorded on its 22 distinct pairs, seizures from `chb01-summary.txt` left out with their margins;
-median 27 events/min. No spike annotations exist for it.
+median 27 events/min. Through eeg-prep (all 42 chb01 recordings, kept bipolar-longitudinal,
+`data/work/chbmit/eeg-spikes/`): 42 ok, median 25 events/min, median laterality index 0.01. No
+spike annotations exist for it.
 
 **ds003555** (eeg-prep and eeg-sleep outputs, 3 children, 3 h of sleep EEG each; the workflow's
 own path, output in `data/work/ds003555/eeg-spikes/`): spike events per minute in W / N1 / N2 / N3 /
