@@ -24,9 +24,10 @@ application:
 runtime:
   # One recording at a time, one 5-minute window of all channels at a time, channels in
   # parallel (THREADS). Measured (amd64 emulated, 2 vCPU): a 13.5 h, 19-channel, 256 Hz Siena
-  # recording in 105 s at 1.23 GB cgroup peak (page cache included); see README "Runtime".
+  # recording in 105 s at 1.23 GB cgroup peak; 3 x 3 h at 1024 Hz in 87 s at 1.60 GB (page cache
+  # included, process RSS ~0.7 GB); see README "Runtime".
   cpu: 2048
-  memory: 2048
+  memory: 3072
   computeTypes:
     - standard
   timeoutSeconds: 7200

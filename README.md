@@ -165,24 +165,39 @@ in sleep than in wake in 8 of 9 patients with both states, the detector's in 6 o
 artefact detections dominate). vEpiSet is not staged by the workflow's fetch script (16.9 GB); the 30 recordings were read out of the figshare zip
 with HTTP range requests (`validation/vepiset_to_bids.py`, `validation/vepiset_eval.py`).
 
-**(c) Siena** (all 41 recordings, 14 adults, 141 h; the plain BIDS Siena dataset in average
-reference, low-passed at 30 Hz by its source, no artefact removal), per-patient laterality of spike
-events against the seizure lateralisation in PhysioNet's `subject_info.csv` (13 patients with a
-left or right temporal focus; PN10, bilateral frontal, left out): **4 of 13 agree** (sign test p =
-0.27; 6–8 of 13 with `MIN_EVENT_CHANNELS` 2–6 or the referential montage, never better than chance).
-Median 40 events/min per recording, an implausible interictal rate for scalp EEG, which again says
-most detections are not IEDs; the laterality index then reflects asymmetric artefact as much as
-spikes. **On this dataset the app's lateralisation does not recover the seizure side.** The
-seizure side is also only a proxy: interictal spikes need not be on the seizure side. eeg-prep's ICA-cleaned derivative of Siena should remove some of the artefact; see
-"Results on eeg-prep output" when it has been run.
+**(c) Siena**, per-patient laterality of spike events against the seizure lateralisation in
+PhysioNet's `subject_info.csv` (13 patients with a left or right temporal focus, 9 left and 4
+right; PN10, bilateral frontal, left out), all runs of a patient pooled
+(`validation/siena_lateralisation.py`):
 
-**CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure): runs as recorded on its 22
-distinct pairs, seizures from `chb01-summary.txt` left out with their margins; median 27 events/min.
-No spike annotations exist for it.
+| Input (41 recordings, 141 h) | Events/min per recording, median (IQR) | Laterality agrees with the seizure side | Patients with a left-sided index |
+|---|---|---|---|
+| **eeg-prep derivative** (ICA + ICLabel, bad segments; `data/work/siena/eeg-prep/eeg`) | 16 (12–26) | **9 of 13** (sign test p = 0.27); 8–9 of 13 with `MIN_EVENT_CHANNELS` 2–3 | 11 of 13 |
+| plain BIDS Siena (no artefact handling) | 40 (31–65) | 4 of 13 (p = 0.27); 6–8 of 13 with `MIN_EVENT_CHANNELS` 2–6 or the referential montage | 7 of 13 |
+
+eeg-prep's artefact handling halves the detections and moves the agreement from below to above
+chance, but **9 of 13 is what always answering "left" scores on this cohort** (9 of the 13 foci
+are left): the index came out left-sided in 11 of 13 patients, including 3 of the 4 right-sided
+ones. So on Siena the app's lateralisation does not reliably recover the seizure side, and a left
+bias (artefact or montage asymmetry) cannot be excluded. Rates of 16 events/min are implausibly
+high for interictal spiking on scalp EEG, which again says most detections are not IEDs. The
+seizure side is also only a proxy: interictal spikes need not be on the seizure side. Siena is
+low-passed at 30 Hz by its source.
+
+**CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure, read directly): runs as
+recorded on its 22 distinct pairs, seizures from `chb01-summary.txt` left out with their margins;
+median 27 events/min. No spike annotations exist for it.
+
+**ds003555** (eeg-prep and eeg-sleep outputs, 3 children, 3 h of sleep EEG each; the workflow's
+own path, output in `data/work/ds003555/eeg-spikes/`): spike events per minute in W / N1 / N2 / N3 /
+R: sub-01 (bilateral ischaemic lesions) 88 / 82 / 83 / 103 / 81; sub-02 (genetic) 20 / 19 / 19 / 27
+/ 13; sub-03 (suspected FCD) 68 / 79 / 128 / 136 / 95, i.e. NREM/wake 1.07, 0.95 and 1.83. The
+dataset has no spike annotations to check these against; at these rates sleep transients (vertex
+waves, K-complexes) are certainly among the detections.
 
 ## Runtime
 
-`computeTypes: [standard]`, **2 vCPU / 2 GiB**, 2 h timeout. One recording at a time, one 5-minute
+`computeTypes: [standard]`, **2 vCPU / 3 GiB**, 2 h timeout. One recording at a time, one 5-minute
 window of every channel at a time, channels in parallel; memory is bounded by the window, not by
 the recording length.
 
@@ -190,7 +205,8 @@ Measured in Docker (linux/amd64 **emulated** on an M-series Mac, `--cpus 2 --mem
 
 | Input | Wall time | Peak memory (cgroup `memory.peak`, page cache included) |
 |---|---|---|
-| Siena sub-01 run-00: 13.5 h, 19 channels, 256 Hz (803 min analysed, 18 pairs) | 105 s | 1.23 GB (main process 0.70 GB RSS) |
+| Siena sub-01 run-00 (plain BIDS): 13.5 h, 19 channels, 256 Hz (803 min analysed, 18 pairs) | 105 s | 1.23 GB (main process 0.70 GB RSS) |
+| ds003555 eeg-prep derivative + eeg-sleep hypnograms: 3 × 3 h, 23 channels, 1024 Hz | 87 s | 1.60 GB (main process 0.61 GB RSS) |
 | synthetic fixture (2 recordings, 9 min), `--read-only --user 65534` Lambda-style | 8 s | 0.85 GB |
 
 About 8 s per recording-hour on 2 emulated vCPU (native arm64: all 141 h of Siena in 5.3 min on 4
@@ -216,8 +232,9 @@ make run-demo DEMO=../workflow-scalp-eeg/data/work/siena/eeg-prep/eeg   # an eeg
 - **No artefact classifier.** Muscle, eye movements (frontopolar and F7/F8 channels), electrode
   pops and sleep transients (vertex waves, K-complexes, POSTS) are detected as spikes. eeg-prep's ICA
   and bad segments remove some of them; nothing in this app classifies morphology.
-- **Lateralisation did not agree with the seizure side on Siena** (Validation c). Do not read a
-  laterality index as a lateralising finding.
+- **Lateralisation did not reliably agree with the seizure side on Siena** (9 of 13 on eeg-prep
+  output, no better than always answering "left"; Validation c). Do not read a laterality index
+  as a lateralising finding.
 - **Rates per sleep stage** inherit the detector's false positives (more artefact in wake) and
   eeg-sleep's staging (EEG-only). The increase of spiking with sleep depth is long described
   (Malow et al. 1998); the use of spike patterns around sleep for localisation (Conrad et al. 2023)
