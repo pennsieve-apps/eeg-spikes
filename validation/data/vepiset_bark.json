@@ -1,0 +1,41 @@
+{
+ "label": "bark",
+ "epochs_pos": 900,
+ "epochs_neg": 8135,
+ "auroc": 0.727,
+ "mark_recall_250ms": 0.519,
+ "marks": 1477,
+ "events_per_min_no_ied_patients": 22.16,
+ "operating_points": [
+  {
+   "min_channels": 1,
+   "sensitivity": 0.699,
+   "specificity": 0.697,
+   "precision": 0.203
+  },
+  {
+   "min_channels": 2,
+   "sensitivity": 0.489,
+   "specificity": 0.872,
+   "precision": 0.297
+  },
+  {
+   "min_channels": 3,
+   "sensitivity": 0.35,
+   "specificity": 0.933,
+   "precision": 0.365
+  },
+  {
+   "min_channels": 4,
+   "sensitivity": 0.223,
+   "specificity": 0.959,
+   "precision": 0.376
+  },
+  {
+   "min_channels": 6,
+   "sensitivity": 0.092,
+   "specificity": 0.983,
+   "precision": 0.379
+  }
+ ]
+}
