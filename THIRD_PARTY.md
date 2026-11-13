@@ -1,0 +1,37 @@
+# Third-party software
+
+This app is Apache-2.0 (see `LICENSE`). The image it builds contains the following
+third-party components, installed from PyPI as binary wheels at the versions pinned in
+`requirements.txt`. All are permissively licensed (BSD, MIT, Apache-2.0, PSF-based, MPL-2.0
+for two pure-Python helpers); nothing GPL is linked in-process.
+
+| Component | Version | What it does here | Licence | Source |
+|---|---|---|---|---|
+| epycom | 0.3 | Spike detectors: `detect_spikes_janca` (Janca et al. 2015), `detect_spikes_barkmeier` (Barkmeier et al. 2012) | Apache-2.0 (its `LICENSE.txt` and the GitHub repository). The PyPI metadata says "BSD 3.0", and the headers of its source files (42 files, including both spike detectors) say "Distributed under the (new) BSD License. See LICENSE.txt for more info."; the `LICENSE.txt` they point to is Apache-2.0, which is what we follow (both are permissive). Copyright holders per those headers: St. Anne's University Hospital in Brno, International Clinical Research Center, Biomedical Engineering; and the Institute of Scientific Instruments of the CAS, v. v. i., Medical signals - Computational neuroscience | https://github.com/ICRC-BME/epycom |
+| MNE-Python | 1.12.1 | Reads EDF/BDF/BrainVision/FIF/EEGLAB lazily, one window at a time; the `standard_1005` template positions and `plot_topomap` for the spike-rate map | BSD-3-Clause | https://mne.tools |
+| NumPy | 1.26.4 | Arrays (epycom 0.3 needs NumPy < 1.27). The wheel bundles OpenBLAS (BSD-3-Clause) and the GCC Fortran runtime (GPL-3.0 with the GCC Runtime Library Exception, which places no obligations on code linked against it) | BSD-3-Clause | https://numpy.org |
+| SciPy | 1.17.1 | Filters, resampling, notch, peak finding. Bundles OpenBLAS and the GCC Fortran runtime as above | BSD-3-Clause | https://scipy.org |
+| numba, llvmlite | 0.68.1, 0.50.0 | JIT compiler epycom imports (its CS HFO detector) | BSD-2-Clause; llvmlite BSD-2-Clause AND Apache-2.0 WITH LLVM-exception (bundled LLVM) | https://numba.pydata.org |
+| pandas | 3.0.6 | Imported by epycom | BSD-3-Clause | https://pandas.pydata.org |
+| joblib, cloudpickle | 1.6.0, 3.1.2 | Channels in parallel (process pool) | BSD-3-Clause | https://joblib.readthedocs.io |
+| Matplotlib | 3.11.2 | Figures (spike-rate topomap via MNE, rates per stage, example spikes) | Matplotlib License (PSF-based, BSD-compatible); bundled DejaVu/STIX fonts under their own free licences | https://matplotlib.org |
+| contourpy, cycler, kiwisolver | 1.3.3, 0.12.1, 1.5.1 | Matplotlib dependencies | BSD-3-Clause | PyPI |
+| fonttools, pyparsing | 4.68.0, 3.3.3 | Matplotlib dependencies | MIT | PyPI |
+| pillow | 13.0.0 | Matplotlib dependency | MIT-CMU | https://python-pillow.org |
+| decorator, lazy-loader, packaging | 5.3.1, 0.6, 26.3 | MNE dependencies | BSD-2-Clause; BSD-3-Clause; Apache-2.0 OR BSD-2-Clause | PyPI |
+| Jinja2, MarkupSafe | 3.1.6, 3.0.4 | MNE dependencies (HTML reports, unused) | BSD-3-Clause | https://palletsprojects.com |
+| pooch, platformdirs, requests, certifi, charset-normalizer, idna, urllib3 | 1.9.0, 4.14.0, 2.34.2, 2026.10.23, 3.5.2, 3.20, 2.8.0 | MNE dependencies (dataset downloads, never used: no network at run time) | BSD-3-Clause; MIT; Apache-2.0; MPL-2.0; MIT; BSD-3-Clause; MIT | PyPI |
+| tqdm | 4.70.1 | MNE dependency (progress bars) | MPL-2.0 AND MIT | https://tqdm.github.io |
+| python-dateutil, six, tzdata | 3.0.0, 1.17.0, 2026.6 | pandas/Matplotlib dependencies | Apache-2.0/BSD dual; MIT; Apache-2.0 | PyPI |
+| python:3.12.16-slim-bookworm (amd64 digest sha256:0f086103b026048cc50cb5da25ec435c023c5241a83fc44daea593377abc61c4) | — | Base image (Debian 12 + CPython 3.12, pip) | PSF-2.0 (Python); Debian packages under their own free licences; pip MIT | https://hub.docker.com/_/python |
+
+scikit-learn, which epycom 0.3 declares as a dependency, is not installed: none of the
+detectors imports it.
+
+No model weights are bundled: both detectors are signal-processing methods.
+
+Data used for testing and validation (not in the image or the repository): Siena Scalp EEG
+Database (Detti P; PhysioNet doi:10.13026/5d4a-j060; BIDS conversion by Dan J and Detti P, Zenodo
+doi:10.5281/zenodo.10640762, CC BY 4.0), CHB-MIT Scalp EEG Database (Shoeb A; PhysioNet
+doi:10.13026/C2K01R, ODC-By 1.0), and 30 recordings of vEpiSet (Lin N et al.; figshare
+doi:10.6084/m9.figshare.28069568.v2, CC BY 4.0).

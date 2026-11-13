@@ -1,0 +1,41 @@
+{
+ "label": "ref",
+ "epochs_pos": 900,
+ "epochs_neg": 8135,
+ "auroc": 0.819,
+ "mark_recall_250ms": 0.783,
+ "marks": 1477,
+ "events_per_min_no_ied_patients": 18.24,
+ "operating_points": [
+  {
+   "min_channels": 1,
+   "sensitivity": 0.908,
+   "specificity": 0.576,
+   "precision": 0.191
+  },
+  {
+   "min_channels": 2,
+   "sensitivity": 0.762,
+   "specificity": 0.776,
+   "precision": 0.274
+  },
+  {
+   "min_channels": 3,
+   "sensitivity": 0.559,
+   "specificity": 0.877,
+   "precision": 0.335
+  },
+  {
+   "min_channels": 4,
+   "sensitivity": 0.466,
+   "specificity": 0.92,
+   "precision": 0.392
+  },
+  {
+   "min_channels": 6,
+   "sensitivity": 0.344,
+   "specificity": 0.962,
+   "precision": 0.498
+  }
+ ]
+}

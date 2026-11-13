@@ -1,0 +1,41 @@
+{
+ "label": "k8",
+ "epochs_pos": 900,
+ "epochs_neg": 8135,
+ "auroc": 0.63,
+ "mark_recall_250ms": 0.215,
+ "marks": 1477,
+ "events_per_min_no_ied_patients": 3.02,
+ "operating_points": [
+  {
+   "min_channels": 1,
+   "sensitivity": 0.348,
+   "specificity": 0.912,
+   "precision": 0.305
+  },
+  {
+   "min_channels": 2,
+   "sensitivity": 0.232,
+   "specificity": 0.947,
+   "precision": 0.326
+  },
+  {
+   "min_channels": 3,
+   "sensitivity": 0.131,
+   "specificity": 0.971,
+   "precision": 0.331
+  },
+  {
+   "min_channels": 4,
+   "sensitivity": 0.102,
+   "specificity": 0.981,
+   "precision": 0.372
+  },
+  {
+   "min_channels": 6,
+   "sensitivity": 0.043,
+   "specificity": 0.992,
+   "precision": 0.379
+  }
+ ]
+}

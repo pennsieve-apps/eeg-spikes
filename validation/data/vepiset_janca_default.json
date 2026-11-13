@@ -1,0 +1,41 @@
+{
+ "label": "janca",
+ "epochs_pos": 900,
+ "epochs_neg": 8135,
+ "auroc": 0.787,
+ "mark_recall_250ms": 0.745,
+ "marks": 1477,
+ "events_per_min_no_ied_patients": 18.74,
+ "operating_points": [
+  {
+   "min_channels": 1,
+   "sensitivity": 0.873,
+   "specificity": 0.568,
+   "precision": 0.183
+  },
+  {
+   "min_channels": 2,
+   "sensitivity": 0.712,
+   "specificity": 0.735,
+   "precision": 0.229
+  },
+  {
+   "min_channels": 3,
+   "sensitivity": 0.583,
+   "specificity": 0.842,
+   "precision": 0.29
+  },
+  {
+   "min_channels": 4,
+   "sensitivity": 0.474,
+   "specificity": 0.895,
+   "precision": 0.333
+  },
+  {
+   "min_channels": 6,
+   "sensitivity": 0.316,
+   "specificity": 0.96,
+   "precision": 0.463
+  }
+ ]
+}
