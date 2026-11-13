@@ -224,7 +224,7 @@ waves, K-complexes) are certainly among the detections.
 
 ## Runtime
 
-`computeTypes: [standard]`, **2 vCPU / 3 GiB**, 2 h timeout. One recording at a time, one 5-minute
+`computeTypes: [standard]`, **2 vCPU / 4 GiB** (Fargate's smallest size for 2 vCPU; peak use is about 1.6 GB), 2 h timeout. One recording at a time, one 5-minute
 window of every channel at a time, channels in parallel; memory is bounded by the window, not by
 the recording length.
 

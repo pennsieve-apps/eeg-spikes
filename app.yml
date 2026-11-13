@@ -27,7 +27,8 @@ runtime:
   # recording in 105 s at 1.23 GB cgroup peak; 3 x 3 h at 1024 Hz in 87 s at 1.60 GB (page cache
   # included, process RSS ~0.7 GB); see README "Runtime".
   cpu: 2048
-  memory: 3072
+  # 4096, not 3072: Fargate has no 2 vCPU / 3 GB size (2 vCPU takes 4-16 GB).
+  memory: 4096
   computeTypes:
     - standard
   timeoutSeconds: 7200
