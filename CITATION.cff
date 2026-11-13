@@ -328,6 +328,53 @@ references:
   identifiers:
   - type: other
     value: "10851218"
+- type: thesis
+  title: Application of machine learning to epileptic seizure onset detection and treatment
+  authors:
+  - family-names: Shoeb
+    given-names: Ali Hossam
+  year: 2009
+  institution:
+    name: Massachusetts Institute of Technology
+  url: https://dspace.mit.edu/handle/1721.1/54669
+- type: data
+  title: Dataset of EEG recordings of pediatric patients with epilepsy based on the 10-20 system
+  authors:
+  - name: Dorottya Cserpan
+  - name: Ece Boran
+  - name: Richard Rosch
+  - name: San Pietro Lo Biundo
+  - name: Georgia Ramantani
+  - name: Johannes Sarnthein
+  year: 2021
+  version: 1.0.1
+  publisher:
+    name: OpenNeuro
+  doi: 10.18112/openneuro.ds003555.v1.0.1
+- type: article
+  title: Scalp high-frequency oscillation rates are higher in younger children
+  authors:
+  - family-names: Cserpan
+    given-names: Dorottya
+  - family-names: Boran
+    given-names: Ece
+  - family-names: Lo Biundo
+    given-names: Santo Pietro
+  - family-names: Rosch
+    given-names: Richard
+  - family-names: Sarnthein
+    given-names: Johannes
+  - family-names: Ramantani
+    given-names: Georgia
+  year: 2021
+  journal: Brain Communications
+  volume: 3
+  issue: '2'
+  start: fcab052
+  doi: 10.1093/braincomms/fcab052
+  identifiers:
+  - type: other
+    value: '33870193'
 - type: software
   title: 'epycom: ElectroPhYsiology COmputational Module'
   authors:

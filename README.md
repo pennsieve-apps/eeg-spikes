@@ -13,7 +13,8 @@ packages these methods for scalp EEG and validated them on scalp data (below); i
 them. The demo and validation data are the **Siena Scalp EEG Database** (Paolo Detti and colleagues,
 University of Siena; BIDS conversion by Jonathan Dan and Paolo Detti, EPFL), **CHB-MIT** (Ali Shoeb,
 MIT, with Children's Hospital Boston) and **vEpiSet** (Nan Lin, Qiang Lu and colleagues, Peking Union
-Medical College Hospital).
+Medical College Hospital) and **OpenNeuro ds003555** (Dorottya Cserpan, Johannes Sarnthein and
+colleagues, University Hospital Zurich).
 
 > **Both detectors were developed and validated on intracranial EEG**, not on scalp EEG (Janca et
 > al. 2015: "epileptic and non-epileptic intracranial recordings"; Barkmeier et al. 2012:
@@ -67,7 +68,7 @@ everything is merged at its root.
 | `MONTAGE` | `bipolar` | `bipolar`: the 18-pair longitudinal bipolar montage (Fp1-F7, F7-T7, T7-P7, P7-O1; Fp1-F3, F3-C3, C3-P3, P3-O1; Fz-Cz, Cz-Pz; and the right side), from pairs whose two electrodes are good. `referential`: the channels as stored (eeg-prep's average reference). Bipolar-only recordings are always analysed on their own pairs (with a note). |
 | `EXCLUDE_SEIZURE` | `true` | Leave annotated seizures out, `SEIZURE_MARGIN_S` on both sides; a seizure without an end is cut to the end of the recording. `bad_segment` and `artifact` events are always masked: the detector runs through them (its background stays continuous) but what it finds there is dropped and their time is not counted. |
 | `SEIZURE_MARGIN_S` | `60` | Seconds left out before each seizure and after it. |
-| `WINDOW_S` | `300` | Windows the recording is read and analysed in (plus 10 s context each side). Bounds memory. |
+| `WINDOW_S` | `300` | Windows the recording is read and analysed in (plus 10 s context each side). Bounds memory. 60–570: epycom 0.3's Janca detector fails on reads of 600 s or more. |
 | `GROUP_WINDOW_MS` | `50` | Spikes within this many ms of an event's first spike belong to that event. |
 | `MIN_EVENT_CHANNELS` | `1` | Events spanning fewer channels stay in `spike_events.csv` but are not counted in `lateralisation.csv`, the event rates in `summary.json`, the rates per stage and the example figure. 2–3 asks for a field; on vEpiSet it trades sensitivity for specificity without improving their balance (Validation). |
 | `THREADS` | `0` | Channels analysed in parallel (processes); `0` = one per vCPU of the container (cgroup CPU quota, else CPU affinity, else CPU count), capped so ~250 MB per worker + ~600 MB fit the memory limit. Logged and kept in `provenance.json`. |
@@ -312,7 +313,15 @@ Validation and demo data:
 > BIDS conversion: Dan J, Detti P. **BIDS Siena Scalp EEG Database.** EPFL, Zenodo (2024).
 > doi:10.5281/zenodo.10640762 (CC BY 4.0).
 
-> Shoeb A. **CHB-MIT Scalp EEG Database.** PhysioNet (2010). doi:10.13026/C2K01R (ODC-By 1.0).
+> Shoeb A. **CHB-MIT Scalp EEG Database.** PhysioNet (2010). doi:10.13026/C2K01R (ODC-By 1.0). And
+> Shoeb AH. **Application of machine learning to epileptic seizure onset detection and treatment.**
+> PhD thesis, MIT (2009). https://dspace.mit.edu/handle/1721.1/54669.
+
+> Cserpan D, Boran E, Rosch R, Lo Biundo SP, Ramantani G, Sarnthein J. **Dataset of EEG recordings
+> of pediatric patients with epilepsy based on the 10-20 system.** OpenNeuro (2021).
+> doi:10.18112/openneuro.ds003555.v1.0.1 (CC0). And Cserpan D et al. **Scalp high-frequency
+> oscillation rates are higher in younger children.** Brain Communications 3(2):fcab052 (2021).
+> doi:10.1093/braincomms/fcab052, PMID 33870193.
 
 > Goldberger AL, Amaral LAN, Glass L, Hausdorff JM, Ivanov PCh, Mark RG, Mietus JE, Moody GB, Peng
 > C-K, Stanley HE. **PhysioBank, PhysioToolkit, and PhysioNet.** Circulation 101(23):e215 (2000).

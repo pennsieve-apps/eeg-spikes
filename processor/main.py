@@ -178,8 +178,10 @@ def env_params() -> dict:
     if p["margin"] < 0:
         raise ValueError("SEIZURE_MARGIN_S must be >= 0")
     p["window"] = float(raw["WINDOW_S"])
-    if p["window"] < 60:
-        raise ValueError("WINDOW_S must be >= 60")
+    if not 60 <= p["window"] <= 570:
+        # epycom 0.3's Janca detector fails on reads of >= 600 s (window + 2 x PAD_S of context):
+        # its multi-buffer branch indexes a field "pos" that does not exist.
+        raise ValueError("WINDOW_S must be between 60 and 570")
     p["group_window"] = float(raw["GROUP_WINDOW_MS"]) / 1000.0
     if p["group_window"] <= 0:
         raise ValueError("GROUP_WINDOW_MS must be > 0")

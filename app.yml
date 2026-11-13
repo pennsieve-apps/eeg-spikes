@@ -80,9 +80,12 @@ parameters:
     label: Window (s)
     description: >-
       Length of the windows the recording is read and analysed in (10 s of context on each
-      side). Bounds memory; Janca's background statistics adapt within 5 s windows anyway.
+      side). Bounds memory; Janca's background statistics adapt within 5 s windows anyway. At
+      most 570: epycom 0.3's Janca detector fails on reads of 600 s or more (its multi-buffer
+      branch raises "no field of name pos").
     defaultValue: 300
     min: 60
+    max: 570
   - name: GROUP_WINDOW_MS
     type: number
     label: Event window (ms)
