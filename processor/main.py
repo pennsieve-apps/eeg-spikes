@@ -325,7 +325,8 @@ def process_recording(rec: E.Recording, params: dict, parallel, hypnograms: dict
         core_ok = E.subtract([(c0, c1)], [m for m in mask_iv if m[1] > c0 and m[0] < c1])
         for lab, (dets, err) in zip(labels, results):
             if err:
-                errors.setdefault(lab, f"{c0:.0f}-{c1:.0f} s: {err}")
+                e = errors.setdefault(lab, {"windows_failed": 0, "first_error": f"{c0:.0f}-{c1:.0f} s: {err}"})
+                e["windows_failed"] += 1
                 continue
             analysed[lab].extend(core_ok)
             found[lab].extend(d for d in dets if not masked(d[0]))
@@ -335,6 +336,17 @@ def process_recording(rec: E.Recording, params: dict, parallel, hypnograms: dict
                      100 * done_core / max(total_core, 1e-9), done_core / 60, total_core / 60)
             last_log = time.monotonic()
 
+    # detector failures are never silent: a channel that failed in every window is named in the notes,
+    # and a recording on which every channel failed every window is a failed recording
+    for e in errors.values():
+        e["windows"] = windows
+    dead = [l for l in labels if errors.get(l, {}).get("windows_failed", 0) == windows and windows > 0]
+    if windows > 0 and len(dead) == len(labels):
+        first = errors[labels[0]]["first_error"]
+        raise RuntimeError(f"the {det} detector failed on every channel in every window (first error: {first})")
+    for l in dead:
+        rec.notes.append(f"channel {l}: the detector failed in all {windows} window(s), not analysed "
+                         f"({errors[l]['first_error']})")
     minutes = {l: sum(b - a for a, b in analysed[l]) / 60.0 for l in labels}
     info = {c["label"]: c for c in achans}
     spikes = []
@@ -444,7 +456,7 @@ def process_recording(rec: E.Recording, params: dict, parallel, hypnograms: dict
         "events_per_min": None if n_ev_min is None else round(n_ev_min, 3),
         "top_channel": top, "top_channel_rate_per_min": round(rate[top], 3) if top else None,
         "laterality_index": None if li is None else round(li, 3), "n_left": nl, "n_right": nr, "n_midline": nz,
-        "dominant_region": dom_region, "dominant_channel": dom_channel,
+        "most_frequent_leader_region": dom_region, "most_frequent_leading_channel": dom_channel,
     }
     if by_stage:
         ev_rate = {st: round(v["events"] / v["minutes"], 3) for st, v in by_stage.items()}
@@ -507,10 +519,11 @@ def caption(kind: str, rid: str, montage: str, det: str, by_stage: dict | None =
         return (f"{rid}: interictal spike rate ({det_name} detector, validated on intracranial EEG; run here on scalp "
                 f"EEG, {montage} montage). Left: rate per electrode"
                 + (" (for bipolar pairs, the mean of the pairs an electrode belongs to)" if montage == "bipolar" else "")
-                + "; right: spikes per minute on every channel, blue left hemisphere, orange right. Look for one "
-                  "region with consistently higher rates; isolated high rates on frontopolar (Fp1/Fp2) or temporal "
-                  "edge channels are often eye-movement or muscle artefact. A research output, to be reviewed "
-                  "against the EEG before any clinical use.")
+                + "; right: spikes per minute on every channel, blue left hemisphere, orange right. The map shows "
+                  "where the detector fired, not where discharges arise: on scalp EEG most detections are not "
+                  "epileptiform (frontopolar and temporal edge channels pick up eye movements and muscle), so it is "
+                  "not a lateralising or localising finding. Check the example-spike figure before reading it. "
+                  "A research output, to be reviewed against the EEG.")
     if kind == "stages":
         return (f"{rid}: spike events per minute in each sleep stage (minutes analysed above each bar). Interictal "
                 "spikes typically increase in NREM sleep (deepest in N3) and fall in REM (Malow et al. 1998); a "
@@ -603,7 +616,10 @@ def main() -> int:
                 stage_out.rows(res["stage_rows"])
             n_ok += 1
             for ch, err in s["channel_errors"].items():
-                log.warning("%s: channel %s: %s", rec.recording_id, ch, err)
+                log.warning("%s: channel %s: detector failed in %d of %d window(s): %s", rec.recording_id, ch,
+                            err["windows_failed"], err["windows"], err["first_error"])
+                warnings.append(f"{rec.recording_id}: channel {ch}: detector failed in {err['windows_failed']} of "
+                                f"{err['windows']} window(s)")
             for note in s["notes"]:
                 log.warning("%s: %s", rec.recording_id, note)
             h = res["headline"]
@@ -633,8 +649,9 @@ def main() -> int:
                 figures.insert(0, {"path": str(p.relative_to(out_dir)), "caption": (
                     "Laterality index of the spike events of every recording: (left − right) / (left + right) "
                     "events, by the hemisphere of each event's leading channel; +1 = all left, −1 = all right; dot "
-                    "size grows with the number of events. Consistent lateralisation across a patient's recordings "
-                    "is more meaningful than one value; a few events make an extreme index. Research output.")})
+                    "size grows with the number of events. Not a lateralising or localising finding: on the Siena "
+                    "validation the index agreed with the seizure side no better than always answering \"left\" "
+                    "(README, Validation), and a few events make an extreme index. Research output.")})
         except Exception as exc:  # noqa: BLE001
             warnings.append(f"laterality figure not made: {type(exc).__name__}: {exc}")
 
@@ -654,8 +671,10 @@ def main() -> int:
     tables = [{"path": "spike_rates.csv", "caption": "Spike rate per channel (spikes per minute analysed)."},
               {"path": "spike_events.csv", "caption": "Spikes within 50 ms across channels merged into events, with "
                                                       "the leading (earliest) channel and its hemisphere."},
-              {"path": "lateralisation.csv", "caption": "Left, right and midline-led spike events per recording and "
-                                                        "the laterality index (L − R) / (L + R)."},
+              {"path": "lateralisation.csv", "caption": "Left, right and midline-led spike events per recording, the "
+                                                        "laterality index (L − R) / (L + R) and the most frequent "
+                                                        "region of the leading channels (dominant_region): where the "
+                                                        "detector fired, not a lateralising or localising finding."},
               {"path": "spikes.csv", "caption": "Every detected spike."}]
     if stage_out:
         tables.insert(1, {"path": "rates_by_stage.csv", "caption": "Spike rate per channel in each sleep stage."})
@@ -663,7 +682,9 @@ def main() -> int:
                "tables": tables, "warnings": warnings,
                "notice": ("Spikes are detected with detectors developed and validated on intracranial EEG (Janca "
                           "et al. 2015; Barkmeier et al. 2012), run here on scalp EEG. Rates and lateralisation "
-                          "are research outputs to be reviewed against the EEG, not clinical findings.")}
+                          "are research outputs to be reviewed against the EEG, not clinical findings; the laterality "
+                          "index and dominant region are not lateralising or localising findings (on the Siena "
+                          "validation they agreed with the seizure side no better than chance).")}
     with open(out_dir / "summary.json", "w", encoding="utf-8") as fh:
         json.dump(summary, fh, indent=2)
     prov = {

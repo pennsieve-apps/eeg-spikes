@@ -322,3 +322,35 @@ def test_plan_masks_and_unknown_end(tmp_path):
     plan = E.analysis_plan(rec, 300.0, True, 60.0)
     assert plan.segments == [(0.0, 40.0)] and plan.masks == [(10.0, 15.0)]
     assert "end unknown" in plan.excluded[0]["reason"]
+
+
+def test_detector_failure_on_every_channel_fails_the_step(fixture_dir, tmp_path, monkeypatch):
+    """A detector that raises on every channel must fail the recording (and the step), not skip it."""
+    monkeypatch.setattr(D, "detect_channel", lambda *a, **k: ([], "ValueError: no field of name pos"))
+    assert run(monkeypatch, fixture_dir / "linked", tmp_path) == 1
+    prov = json.loads((tmp_path / "eeg-spikes" / "provenance.json").read_text())
+    assert prov["status"] == "failed: every recording failed"
+    assert all(r["status"] == "failed" and "every channel" in r["error"] for r in prov["recordings"].values())
+
+
+def test_detector_failure_on_one_channel_is_reported(fixture_dir, tmp_path, monkeypatch):
+    real = D.detect_channel
+
+    calls = {"n": 0}
+
+    def flaky(x, fs, *a, **k):  # fails on the first channel (Fp1-F7) of every 18-channel window
+        calls["n"] += 1
+        if (calls["n"] - 1) % 18 == 0:
+            return [], "ValueError: boom"
+        return real(x, fs, *a, **k)
+
+    monkeypatch.setattr(D, "detect_channel", flaky)
+    assert run(monkeypatch, fixture_dir / "linked", tmp_path) == 0
+    out = tmp_path / "eeg-spikes"
+    prov = json.loads((out / "provenance.json").read_text())
+    r1 = prov["recordings"][REC1]
+    assert r1["status"] == "ok"
+    assert r1["channel_errors"]["Fp1-F7"]["windows_failed"] == r1["windows"]
+    assert any("Fp1-F7" in n and "failed in all" in n for n in r1["notes"])
+    assert (REC1, "Fp1-F7") not in {(r["recording_id"], r["channel"]) for r in read_csv(out / "spike_rates.csv")}
+    assert any("Fp1-F7" in w for w in json.loads((out / "summary.json").read_text())["warnings"])

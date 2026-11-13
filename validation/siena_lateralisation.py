@@ -5,6 +5,11 @@ subject_info.csv: localization, lateralization).
 
 Usage: python validation/siena_lateralisation.py <eeg-spikes output folder> <subject_info.csv> [min_channels]
 
+subject_info.csv is not in this repository; fetch it from PhysioNet (Siena Scalp EEG Database
+v1.0.0, doi:10.13026/5d4a-j060):
+
+    curl -O https://physionet.org/files/siena-scalp-eeg/1.0.0/subject_info.csv
+
 Pools every run of a patient: events led by a left vs a right channel (laterality index
 (L-R)/(L+R)), and the mean per-channel spike rate over left vs right channels. Prints a table and
 the agreement with the annotated side (bilateral patients left out), with a two-sided sign test.

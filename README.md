@@ -2,8 +2,9 @@
 
 This app packages the interictal spike detectors of **epycom** (ElectroPhYsiology COmputational
 Module), developed by the Biomedical Engineering Department of the International Clinical Research
-Center at St. Anne's University Hospital in Brno (FNUSA-ICRC; https://github.com/ICRC-BME/epycom,
-Apache-2.0). The default detector is the envelope-distribution method of **Radek Janca and
+Center at St. Anne's University Hospital in Brno (FNUSA-ICRC) with the Institute of Scientific
+Instruments of the Czech Academy of Sciences (both copyright holders per its source files;
+https://github.com/ICRC-BME/epycom, Apache-2.0). The default detector is the envelope-distribution method of **Radek Janca and
 colleagues** (Janca et al. 2015, *Brain Topography*, doi:10.1007/s10548-014-0379-1), reprogrammed in
 Python for epycom by Daniel Uher and Jan Cimbalnik (per epycom's source); the alternative is the slope-and-amplitude
 method of **Daniel Barkmeier, Jeffrey Loeb and colleagues** (Barkmeier et al. 2012, *Clinical
@@ -11,7 +12,8 @@ Neurophysiology*, doi:10.1016/j.clinph.2011.09.023). Recordings are read with **
 (Alexandre Gramfort and the MNE community; https://mne.tools; Gramfort et al. 2013). Pennsieve
 packages these methods for scalp EEG and validated them on scalp data (below); it did not develop
 them. The demo and validation data are the **Siena Scalp EEG Database** (Paolo Detti and colleagues,
-University of Siena; BIDS conversion by Jonathan Dan and Paolo Detti, EPFL), **CHB-MIT** (Ali Shoeb,
+University of Siena; BIDS conversion by Jonathan Dan, EPFL, with Paolo Detti, published on Zenodo by
+EPFL), **CHB-MIT** (Ali Shoeb,
 MIT, with Children's Hospital Boston) and **vEpiSet** (Nan Lin, Qiang Lu and colleagues, Peking Union
 Medical College Hospital) and **OpenNeuro ds003555** (Dorottya Cserpan, Johannes Sarnthein and
 colleagues, University Hospital Zurich).
@@ -32,7 +34,9 @@ sharp waves) on the longitudinal bipolar montage ("double banana") it derives fr
 referential recording, as you would read it. Spikes on different channels within 50 ms are merged
 into one **spike event** with its **leading channel** (the one that peaks first) and that channel's
 hemisphere. Per recording you get the spike rate of every channel, a **laterality index** of the
-events (left vs right leading channel) and the dominant region. With eeg-sleep's hypnogram
+events (left vs right leading channel) and the most frequent region of the leading channels:
+these say where the detector fired, **not a lateralising or localising finding** (on Siena they
+agreed with the seizure side no better than always answering "left"). With eeg-sleep's hypnogram
 linked, every spike gets the sleep stage of its epoch and rates are given per stage: interictal
 spiking increases with sleep depth in temporal lobe epilepsy (Malow et al. 1998), and spike rates around sleep help localise the seizure-onset zone (Conrad et al. 2023,
 an **intracranial** result). Seizures (with 60 s margins) and eeg-prep's bad segments are left
@@ -97,7 +101,7 @@ margins, bad segments, and the first and last second of each analysed stretch ex
 **`lateralisation.csv`**: per recording `recording_id, n_left, n_right, n_midline` (counted events
 by the hemisphere of their leading channel), `laterality_index` = (L − R)/(L + R) (empty with no
 lateral events), `dominant_region` (most frequent side and region of the leaders, e.g. `left
-temporal`), and `n_events, minutes, rate_left_per_min, rate_right_per_min` (mean per-channel rate
+temporal`; where the detector fired most, not a localising finding), and `n_events, minutes, rate_left_per_min, rate_right_per_min` (mean per-channel rate
 over left/right channels), `rate_laterality_index`, `dominant_channel`, `montage`, `detector`.
 
 **`rates_by_stage.csv`** (when stages are known): `recording_id, channel, stage, n_spikes, minutes,
@@ -114,9 +118,15 @@ and 90th percentile of its amplitude, all channels stacked), `laterality_index.p
 recordings).
 
 **`summary.json`**: headline numbers per recording (minutes analysed, spikes, events, events/min,
-top channel, laterality index, dominant region and channel, events/min per stage, NREM/wake ratio),
+top channel, laterality index, `most_frequent_leader_region` and `most_frequent_leading_channel`,
+events/min per stage, NREM/wake ratio),
 the figures in report order with captions, the tables, warnings, and a notice that the detectors
-are intracranial-validated. **`provenance.json`**: the keys of conventions.md (tools and versions,
+are intracranial-validated and that laterality and regions are not lateralising or localising
+findings. Detector failures are never silent: a channel on which the detector fails in some
+windows is listed in `provenance.json` (`channel_errors`: windows failed, first error), the log and
+`summary.json` warnings; a channel that fails in every window is named in the recording's notes;
+a recording on which every channel fails is `failed`, and the step exits 1 when every recording
+failed. **`provenance.json`**: the keys of conventions.md (tools and versions,
 parameters, inputs, times, peak RSS, threads, per recording status/seconds/montage plus analysed
 and excluded intervals, channels not analysed and why, notes), `citations` (DOIs for the report).
 
@@ -164,17 +174,20 @@ default because clinicians read spikes on it and the two are within noise of eac
 wake/sleep annotations (used through the annotation fallback): the experts' IED rate was higher
 in sleep than in wake in 8 of 9 patients with both states, the detector's in 6 of 9 (in wake,
 artefact detections dominate). vEpiSet is not staged by the workflow's fetch script (16.9 GB); the 30 recordings were read out of the figshare zip
-with HTTP range requests (`validation/vepiset_to_bids.py`, `validation/vepiset_eval.py`).
+with HTTP range requests (`validation/vepiset_to_bids.py`, `validation/vepiset_eval.py`). The 30
+recordings are listed in `validation/data/vepiset_recordings.txt` (the first 20 with IEDs, then 10
+without); the scores of each setting in the table are `validation/data/vepiset_*.json`.
 
 **(c) Siena**, per-patient laterality of spike events against the seizure lateralisation in
 PhysioNet's `subject_info.csv` (13 patients with a left or right temporal focus, 9 left and 4
 right; PN10, bilateral frontal, left out), all runs of a patient pooled
-(`validation/siena_lateralisation.py`):
+(`validation/siena_lateralisation.py`; `subject_info.csv` is fetched from PhysioNet,
+https://physionet.org/files/siena-scalp-eeg/1.0.0/subject_info.csv):
 
 | Input (41 recordings, 141 h) | Events/min per recording, median (IQR) | Laterality agrees with the seizure side | Patients with a left-sided index |
 |---|---|---|---|
 | **eeg-prep derivative** (ICA + ICLabel; bad segments for technical artefacts only, 4.6 % of the time; `data/work/siena/eeg-prep/eeg`) | 21 (14–35) | **9 of 13** (sign test p = 0.27); also 9 of 13 with `MIN_EVENT_CHANNELS` 2–3 | 11 of 13 |
-| plain BIDS Siena (no artefact handling) | 40 (31–65) | 4 of 13 (p = 0.27); 6–8 of 13 with `MIN_EVENT_CHANNELS` 2–6 or the referential montage | 7 of 13 |
+| plain BIDS Siena (no artefact handling; output in `data/work/siena/eeg-spikes-raw-bids/`) | 40 (31–65) | 4 of 13 (p = 0.27); 6–8 of 13 with `MIN_EVENT_CHANNELS` 2–6 or the referential montage | 7 of 13 |
 
 eeg-prep's artefact handling halves the detections and moves the agreement from below to above
 chance, but **9 of 13 is what always answering "left" scores on this cohort** (9 of the 13 foci
@@ -191,7 +204,8 @@ opposite of the sleep activation expected of true interictal spikes (Malow et al
 the detections are dominated by muscle and movement artefact. Read rates per stage from this app
 only together with the example-spike figure.
 
-**CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure, read directly): runs as
+**CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure, read directly; output in
+`data/work/chbmit/eeg-spikes-raw-edf/`): runs as
 recorded on its 22 distinct pairs, seizures from `chb01-summary.txt` left out with their margins;
 median 27 events/min. Through eeg-prep (all 42 chb01 recordings, kept bipolar-longitudinal,
 `data/work/chbmit/eeg-spikes/`): 42 ok, median 30 events/min, median laterality index −0.01. No
