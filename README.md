@@ -199,7 +199,7 @@ seizure side is also only a proxy: interictal spikes need not be on the seizure 
 low-passed at 30 Hz by its source.
 
 With eeg-sleep's hypnograms (35 of the 41 Siena recordings staged), the spike-event rate was
-higher in NREM than in wake in only **10 of 35** recordings (median NREM/wake ratio 0.63), the
+higher in NREM than in wake in only **10 of 35** recordings (median NREM/wake ratio 0.62), the
 opposite of the sleep activation expected of true interictal spikes (Malow et al. 1998): in wake
 the detections are dominated by muscle and movement artefact. Read rates per stage from this app
 only together with the example-spike figure.
@@ -208,8 +208,11 @@ only together with the example-spike figure.
 `data/work/chbmit/eeg-spikes-raw-edf/`): runs as
 recorded on its 22 distinct pairs, seizures from `chb01-summary.txt` left out with their margins;
 median 27 events/min. Through eeg-prep (all 42 chb01 recordings, kept bipolar-longitudinal,
-`data/work/chbmit/eeg-spikes/`): 42 ok, median 30 events/min, median laterality index −0.01. No
-spike annotations exist for it.
+`data/work/chbmit/eeg-spikes/`): 42 ok, median 30 events/min, median laterality index −0.01. With
+eeg-sleep's chb01 hypnograms linked (39 of 42 recordings staged; 36 with both NREM and wake), the
+spike-event rate was higher in NREM than in wake in only 9 of 36 recordings (median NREM/wake
+ratio 0.79), as on Siena: artefact in wake dominates the detections. No spike annotations exist
+for it.
 
 **ds003555** (eeg-prep and eeg-sleep outputs, 3 children, 3 h of sleep EEG each; the workflow's
 own path, output in `data/work/ds003555/eeg-spikes/`): spike events per minute in W / N1 / N2 / N3 /
