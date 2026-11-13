@@ -172,28 +172,35 @@ right; PN10, bilateral frontal, left out), all runs of a patient pooled
 
 | Input (41 recordings, 141 h) | Events/min per recording, median (IQR) | Laterality agrees with the seizure side | Patients with a left-sided index |
 |---|---|---|---|
-| **eeg-prep derivative** (ICA + ICLabel, bad segments; `data/work/siena/eeg-prep/eeg`) | 16 (12–26) | **9 of 13** (sign test p = 0.27); 8–9 of 13 with `MIN_EVENT_CHANNELS` 2–3 | 11 of 13 |
+| **eeg-prep derivative** (ICA + ICLabel; bad segments for technical artefacts only, 4.6 % of the time; `data/work/siena/eeg-prep/eeg`) | 21 (14–35) | **9 of 13** (sign test p = 0.27); also 9 of 13 with `MIN_EVENT_CHANNELS` 2–3 | 11 of 13 |
 | plain BIDS Siena (no artefact handling) | 40 (31–65) | 4 of 13 (p = 0.27); 6–8 of 13 with `MIN_EVENT_CHANNELS` 2–6 or the referential montage | 7 of 13 |
 
 eeg-prep's artefact handling halves the detections and moves the agreement from below to above
 chance, but **9 of 13 is what always answering "left" scores on this cohort** (9 of the 13 foci
 are left): the index came out left-sided in 11 of 13 patients, including 3 of the 4 right-sided
 ones. So on Siena the app's lateralisation does not reliably recover the seizure side, and a left
-bias (artefact or montage asymmetry) cannot be excluded. Rates of 16 events/min are implausibly
+bias (artefact or montage asymmetry) cannot be excluded. Rates of 21 events/min are implausibly
 high for interictal spiking on scalp EEG, which again says most detections are not IEDs. The
 seizure side is also only a proxy: interictal spikes need not be on the seizure side. Siena is
 low-passed at 30 Hz by its source.
 
+With eeg-sleep's hypnograms (35 of the 41 Siena recordings staged), the spike-event rate was
+higher in NREM than in wake in only **10 of 35** recordings (median NREM/wake ratio 0.63), the
+opposite of the sleep activation expected of true interictal spikes (Malow et al. 1998): in wake
+the detections are dominated by muscle and movement artefact. Read rates per stage from this app
+only together with the example-spike figure.
+
 **CHB-MIT** (chb01, 6 one-hour bipolar-only recordings, 4 with a seizure, read directly): runs as
 recorded on its 22 distinct pairs, seizures from `chb01-summary.txt` left out with their margins;
 median 27 events/min. Through eeg-prep (all 42 chb01 recordings, kept bipolar-longitudinal,
-`data/work/chbmit/eeg-spikes/`): 42 ok, median 25 events/min, median laterality index 0.01. No
+`data/work/chbmit/eeg-spikes/`): 42 ok, median 30 events/min, median laterality index −0.01. No
 spike annotations exist for it.
 
 **ds003555** (eeg-prep and eeg-sleep outputs, 3 children, 3 h of sleep EEG each; the workflow's
 own path, output in `data/work/ds003555/eeg-spikes/`): spike events per minute in W / N1 / N2 / N3 /
-R: sub-01 (bilateral ischaemic lesions) 88 / 82 / 83 / 103 / 81; sub-02 (genetic) 20 / 19 / 19 / 27
-/ 13; sub-03 (suspected FCD) 68 / 79 / 128 / 136 / 95, i.e. NREM/wake 1.07, 0.95 and 1.83. The
+R: sub-01 (bilateral ischaemic lesions) 92 / 94 / 83 / 103 / 84; sub-02 (genetic) 21 / 13 / 17 / – /
+13 (no N3 scored); sub-03 (suspected FCD) 66 / 82 / 125 / 136 / 89, i.e. NREM/wake 1.01, 0.80 and
+1.91. The
 dataset has no spike annotations to check these against; at these rates sleep transients (vertex
 waves, K-complexes) are certainly among the detections.
 
